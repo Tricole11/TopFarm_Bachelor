@@ -68,3 +68,49 @@ tf_problem = TopFarmProblem(
 
 _, state, _ = tf_problem.optimize()
 tf_problem.plot_comp.plot(wfmodel, state)
+
+
+positions = state
+
+print(state)
+
+opt_x = np.round(positions['x'], 2)
+opt_y = np.round(positions['y'], 2)
+
+# Print out the current positions
+print("Optimized Positions: (x,y)")
+for i, (x, y) in enumerate(zip(opt_x, opt_y)):
+    print(f"Wind Turbine {i+1}: ({x}, {y})")
+
+
+init_x = initial[:, 0]
+init_y = initial[:, 1]
+
+
+# Plot the coordinates
+plt.figure(figsize=(8, 6))
+
+# Plot initial coordinates in red
+plt.plot(init_x, init_y, 'ro', label='Initial Positions')
+
+# Plot optimized coordinates in blue
+plt.plot(opt_x, opt_y, 'bo', label='Optimized Positions')
+
+# Plot the boundary
+boundary_x = [point[0] for point in boundaries]  # Extract x coordinates
+boundary_y = [point[1] for point in boundaries]  # Extract y coordinates
+plt.plot(boundary_x + [boundary_x[0]], boundary_y + [boundary_y[0]], 'k-', label='Boundary')
+
+#Plotting
+plt.title('Wind Turbine Positions')
+plt.xlabel('X Coordinate')
+plt.ylabel('Y Coordinate')
+plt.grid(True)
+plt.legend()
+plt.show()
+
+
+
+
+
+
