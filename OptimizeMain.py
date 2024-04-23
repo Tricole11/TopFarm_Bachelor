@@ -24,8 +24,14 @@ from initializeTurbines import initializeTurbines
 n_wt = 100
 n_wd = 12
 
-#finn på egne tall her
-boundaries = [(-10000, 0), (10000, 0), (10000, 20000), (500, 22000), (-10000, 20000)]
+#examoke boundary
+#boundaries = [(-10000, 0), (10000, 0), (10000, 20000), (500, 22000), (-10000, 20000)]
+
+#Boundaries for sørlige norsjø II
+#boundaries = [(1336965.579, 6343643.86), (1358365.539, 6360396.720), (1383019.537, 6382447.185), (1354868.111, 6417238.752), (1311612.014, 6377417.797)]
+
+#Boundaries for Utsira Nord
+boundaries = [(1265384.397, 6625141.556), (1287449.855, 6633798.704), (1270957.191, 6673574.952), (1249123.155, 6665157.463)]
 
 initial = initializeTurbines(boundaries, n_wt, 1500)
 
