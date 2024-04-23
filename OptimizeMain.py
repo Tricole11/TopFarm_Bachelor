@@ -67,7 +67,6 @@ tf_problem = TopFarmProblem(
             plot_comp=XYPlotComp())
 
 _, state, _ = tf_problem.optimize()
-tf_problem.plot_comp.plot(wfmodel, state)
 
 
 positions = state
