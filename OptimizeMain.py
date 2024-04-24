@@ -24,7 +24,7 @@ from initializeTurbines import initializeTurbines
 n_wt = 100
 n_wd = 12
 
-#examoke boundary
+#example boundary
 #boundaries = [(-10000, 0), (10000, 0), (10000, 20000), (500, 22000), (-10000, 20000)]
 
 #Boundaries for sørlige norsjø II
