@@ -19,6 +19,8 @@ from topfarm import TopFarmProblem
 from topfarm.easy_drivers import EasyScipyOptimizeDriver
 from topfarm.plotting import NoPlot, XYPlotComp
 from MinimumDistanceMultiRotor import MinimumDistanceMultiRotor
+from optimizeSingleTurbines import optimizeSingleTurbines
+from positionMultiRotor import positionMultiRotor
 
 def main():
 
@@ -65,6 +67,12 @@ def main():
     if 'k' not in st.session_state:
         st.session_state['k'] = list
 
+    if 'initial' not in st.session_state:
+        st.session_state['initial'] = list
+
+    if 'state' not in st.session_state:
+        st.session_state['state'] = list
+    
         
 
     option = st.selectbox(
@@ -77,17 +85,14 @@ def main():
         boundaries = [(1265384.397, 6625141.556), (1287449.855, 6633798.704), (1270957.191, 6673574.952), (1249123.155, 6665157.463)]
         constraint = XYBoundaryConstraint(boundaries, 'polygon')
         st.session_state['f'], st.session_state['A'], st.session_state['k'] = perform_wind_analysis(option, latitude, longitude, start_date_formatted, end_date_formatted)
+        print(st.session_state['f'])
 
     elif option == 'Sørlige Nordsjø II':
         latitude, longitude = 56.8233333, 4.3466667
         boundaries = [(1336965.579, 6343643.86), (1358365.539, 6360396.720), (1383019.537, 6382447.185), (1354868.111, 6417238.752), (1311612.014, 6377417.797)]
         constraint = XYBoundaryConstraint(boundaries, 'polygon')
         st.session_state['f'], st.session_state['A'], st.session_state['k'] = perform_wind_analysis(option, latitude, longitude, start_date_formatted, end_date_formatted)
-
-    
-
-    
-
+        print(st.session_state['f'])
     
 
 
@@ -125,6 +130,10 @@ def main():
             (2,3,4,5,6,7,8), index=None, placeholder="Select number collumns..."
         )
         st.write('You selected:', str(collumns), "number of rows...")
+        n_mr = st.number_input(
+            "Choose how many multi rotor systems the wind park will include",
+            1,375, placeholder="Select number of turbines..."
+        )
     elif rotorType == "Single Rotor":
         
         wd = np.linspace(0, 360, len(st.session_state['f']), endpoint=False)
@@ -146,40 +155,27 @@ def main():
         wfmodel = NOJ(site, wind_turbines)
 
         n_wt = st.number_input("Choose how many turbines the windpark will inhabit",
-                            1,200, placeholder="Select number collumns..."
+                            1,200, placeholder="Select number of turbines..."
                             )
         st.write('You selected:', str(n_wt), "number of turbines")
     
     # Button to trigger optimization
     if st.button("Optimize Wind Farm"):
         if rotorType == 'Single Rotor':
-            initial = initializeTurbines(boundaries, n_wt, 1000)
+            with st.spinner('Wait for it...'):
+                st.session_state['initial'], st.session_state['state'] = optimizeSingleTurbines(boundaries, n_wt, 1000)
+                st.write(st.session_state['state'])
+            st.success('Done!')
             
-            cost_comp = PyWakeAEPCostModelComponent(wfmodel, n_wt, wd=wd)
-
-            driver = EasyScipyOptimizeDriver()
-
-            design_vars = dict(zip('xy', (initial[:, :2]).T))
-
-            tf_problem = TopFarmProblem(
-                design_vars,
-                cost_comp,
-                constraints=constraint,
-                driver=driver,
-                )
-            
-            _, state, _ = tf_problem.optimize()
-
-            print(design_vars)
-            print("")
-            print(state)
-            st.write(state)
 
             #Optimize according to single Rotor
         elif rotorType == 'Multi Rotor':
             #Optimize according to multi Rotor
-            minimumDistance = MinimumDistanceMultiRotor(st.session_state['f'],st.session_state['A'],st.session_state['k'],wd, rows, collumns)
+            minimumDistance = MinimumDistanceMultiRotor(st.session_state['f'],st.session_state['A'],st.session_state['k'], wd, rows, collumns)
             st.write("The minimum distance between multi rotors should be: ", str(minimumDistance))
+            st.session_state['state'] = positionMultiRotor(boundaries, minimumDistance, n_mr)
+            st.write(st.session_state['state'])
+
 
 
     
